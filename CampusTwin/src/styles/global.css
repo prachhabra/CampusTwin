@@ -1,0 +1,146 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    font-family: Arial, sans-serif;
+    background: #f8fafc;
+    color: #0f172a;
+}
+button{
+    cursor: pointer;
+}
+input, select, textarea{
+    font-family: inherit;
+}
+a{
+     text-decoration: none;
+    color: inherit;
+}
+/* ============================================================
+   Added: basic styling for auth pages, dashboards, and layout
+   (kept intentionally simple — Phase 1 basic pass)
+============================================================ */
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+.auth-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+  box-shadow: 0 8px 24px -12px rgba(0,0,0,0.15);
+}
+.logo-circle {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: #4f46e5;
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1.2rem;
+  margin: 0 auto 1rem;
+}
+.auth-subtitle { color: #64748b; margin-bottom: 1.5rem; }
+.auth-card form { display: flex; flex-direction: column; text-align: left; gap: 0.3rem; }
+.auth-card label { font-size: 0.8rem; color: #64748b; margin-top: 0.6rem; }
+.auth-card input, .auth-card select {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+.auth-error { color: #dc2626; font-size: 0.85rem; margin-top: 0.6rem; }
+.primary-btn {
+  margin-top: 1.2rem;
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.7rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.primary-btn:disabled { opacity: 0.6; }
+.register-text { margin-top: 1.2rem; font-size: 0.88rem; color: #64748b; }
+.register-text a { color: #4f46e5; font-weight: 600; }
+
+/* Dashboard layout: sidebar + main area */
+.app-layout { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 240px; flex-shrink: 0;
+  background: #111827; color: #e5e7eb;
+  display: flex; flex-direction: column;
+  padding: 1.2rem 0.8rem;
+}
+.sidebar-logo { display: flex; align-items: center; gap: 0.6rem; padding: 0 0.4rem 1rem; }
+.sidebar-logo-icon {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: #4f46e5; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-weight: 700;
+}
+.sidebar-logo h2 { font-size: 1rem; margin: 0; }
+.sidebar-logo span { font-size: 0.7rem; color: #9ca3af; }
+.role-badge {
+  font-size: 0.68rem; letter-spacing: 0.06em;
+  padding: 0.3rem 0.6rem; border-radius: 100px;
+  text-align: center; margin: 0 0.4rem 1rem; font-weight: 700;
+}
+.admin-badge { background: rgba(220,38,38,0.2); color: #fca5a5; }
+.teacher-badge { background: rgba(217,142,43,0.2); color: #fbbf24; }
+.student-badge { background: rgba(47,93,80,0.3); color: #6ee7b7; }
+.menu { display: flex; flex-direction: column; gap: 0.15rem; flex: 1; overflow-y: auto; }
+.menu-item {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.55rem 0.6rem; border-radius: 6px;
+  font-size: 0.85rem; color: #d1d5db;
+  background: none; border: none; text-align: left; width: 100%;
+}
+.menu-item:hover { background: rgba(255,255,255,0.06); }
+.menu-item.active { background: #4f46e5; color: #fff; }
+.menu-item.logout { margin-top: 0.6rem; color: #f87171; }
+
+.main-area { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.navbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.9rem 1.5rem; background: #fff; border-bottom: 1px solid #e2e8f0;
+}
+.search-box { display: flex; align-items: center; gap: 0.4rem; background: #f1f5f9; padding: 0.4rem 0.8rem; border-radius: 6px; flex: 1; max-width: 320px; margin: 0 1rem; }
+.search-box input { border: none; background: none; outline: none; width: 100%; }
+.navbar-right { display: flex; align-items: center; gap: 1rem; }
+.notification-btn { background: none; border: none; font-size: 1.1rem; }
+.user-info { display: flex; align-items: center; gap: 0.6rem; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
+.user-info small { display: block; color: #64748b; font-size: 0.72rem; }
+
+.page-content { padding: 1.8rem 2rem; }
+.page-subtitle { color: #64748b; margin: 0.3rem 0 1.4rem; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+.stat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.1rem; display: flex; gap: 0.8rem; align-items: flex-start; }
+.stat-icon { font-size: 1.4rem; }
+.stat-title { font-size: 0.8rem; color: #64748b; margin-bottom: 0.2rem; }
+.stat-value { font-size: 1.5rem; margin: 0; }
+.stat-description, .stat-trend { display: block; font-size: 0.72rem; color: #94a3b8; }
+
+/* Digital ID card (Attendance/DigitalID pages) */
+.id-card {
+  max-width: 320px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.4rem;
+  text-align: center;
+  box-shadow: 0 8px 24px -12px rgba(0,0,0,0.15);
+}
+.id-card-header { display: flex; align-items: center; gap: 0.6rem; text-align: left; margin-bottom: 1rem; }
+.id-card-qr { width: 160px; height: 160px; margin: 0.5rem auto; display: block; }
+.id-card-details p { margin: 0.2rem 0; font-size: 0.9rem; }

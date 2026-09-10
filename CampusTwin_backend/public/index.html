@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CampusTwin — The Digital Twin of a College</title>
+<style>
+  :root{
+    --ink:#16233a; --ink-soft:#2c3a52; --paper:#eef0e9; --paper-raised:#f8f8f4;
+    --quad:#2f5d50; --quad-dark:#234840; --signal:#d98e2b; --brick:#a63d2f;
+    --slate:#5b6470; --line:#d3d6cc; --line-dark:#3a4a63;
+    --font-display:"Trebuchet MS","Segoe UI",sans-serif;
+    --font-body:Georgia,"Times New Roman",serif;
+    --font-mono:"Consolas","Courier New",monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{font-family:var(--font-display);font-weight:700;letter-spacing:-.01em;margin:0}
+  p{margin:0;line-height:1.6}
+  a{color:inherit}
+  button,input,select{font-family:inherit}
+  button{cursor:pointer}
+  .eyebrow{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--slate)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:4px;border:1px solid transparent;padding:.7rem 1.3rem;font-family:var(--font-display);font-weight:700;font-size:.92rem;transition:transform .12s ease,background .15s ease,border-color .15s ease;text-decoration:none}
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--quad);color:var(--paper-raised)}
+  .btn-primary:hover{background:var(--quad-dark)}
+  .btn-outline{background:transparent;border-color:var(--line-dark);color:var(--paper-raised)}
+  .btn-outline:hover{border-color:var(--signal);color:var(--signal)}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+  .btn-ghost:hover{border-color:var(--ink)}
+  .card{background:var(--paper-raised);border:1px solid var(--line);border-radius:8px;box-shadow:0 1px 2px rgba(22,35,58,.06),0 8px 24px -12px rgba(22,35,58,.18)}
+  .field{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.1rem}
+  .field label{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate)}
+  .field input,.field select{border:1px solid var(--line);border-radius:4px;padding:.7rem .8rem;font-size:.98rem;background:#fff;color:var(--ink)}
+  .field input:focus,.field select:focus{border-color:var(--quad);outline:2px solid var(--signal);outline-offset:1px}
+  .badge{display:inline-flex;align-items:center;gap:.35rem;font-family:var(--font-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;padding:.22rem .55rem;border-radius:100px;border:1px solid var(--line)}
+  .badge-done{color:var(--quad-dark);border-color:var(--quad);background:rgba(47,93,80,.08)}
+  .badge-progress{color:var(--signal);border-color:var(--signal);background:rgba(217,142,43,.1)}
+  .badge-planned{color:var(--slate)}
+  ::selection{background:var(--signal);color:var(--ink)}
+
+  .navbar{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 2rem;border-bottom:1px solid var(--line-dark);background:var(--ink);color:var(--paper-raised)}
+  .brand{display:flex;align-items:baseline;gap:.5rem;text-decoration:none;color:inherit;cursor:pointer;background:none;border:none}
+  .brand-name{font-family:var(--font-display);font-weight:700;font-size:1.15rem}
+  .navlinks{display:flex;align-items:center;gap:.9rem}
+
+  .ticker{display:flex;align-items:center;gap:.9rem;background:var(--quad-dark);color:var(--paper-raised);padding:.55rem 1.4rem;font-family:var(--font-mono);font-size:.78rem}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--signal);flex-shrink:0;animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+
+  .hero{background:var(--ink);color:var(--paper-raised);padding:4rem 2rem 3.2rem}
+  .hero-inner{max-width:980px;margin:0 auto}
+  .hero h1{font-size:clamp(2.1rem,5vw,3.4rem);line-height:1.05;max-width:760px}
+  .hero p{max-width:560px;margin-top:1.1rem;font-size:1.05rem;color:#c7cedb}
+  .hero-actions{display:flex;gap:.8rem;margin-top:1.8rem}
+
+  .section{padding:3rem 2rem;max-width:980px;margin:0 auto}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.1rem}
+  .wing{padding:1.4rem;text-decoration:none;color:inherit;display:block;cursor:pointer;border:1px solid var(--line);background:var(--paper-raised);border-radius:8px}
+  .wing-code{font-family:var(--font-mono);font-size:.78rem;color:var(--signal);margin-bottom:.7rem}
+  .wing-title{font-family:var(--font-display);font-weight:700;font-size:1.15rem;margin-bottom:.5rem}
+  .wing-desc{font-size:.9rem;color:var(--slate)}
+
+  .footer{border-top:1px solid var(--line);padding:1.4rem 2rem;text-align:center;font-size:.8rem;color:var(--slate)}
+
+  .auth-wrap{display:flex;justify-content:center;padding:3.5rem 1.5rem}
+  .auth-card{width:100%;max-width:400px;padding:2rem}
+  .auth-card.wide{max-width:440px}
+
+  .layout{min-height:100vh;display:flex;flex-direction:column}
+  .body-row{display:flex;flex:1}
+  .sidebar{width:230px;flex-shrink:0;background:var(--ink);color:var(--paper-raised);padding:1.6rem 1.2rem;display:flex;flex-direction:column;gap:1.6rem}
+  .sidebar-nav{display:flex;flex-direction:column;gap:.3rem}
+  .sidebar-nav div{font-family:var(--font-mono);font-size:.8rem;padding:.55rem .6rem;border-radius:4px;color:#c7cedb}
+  .sidebar-foot{margin-top:auto;border-top:1px solid var(--line-dark);padding-top:1rem}
+  .main{flex:1;padding:2rem;background:var(--paper)}
+
+  .stat-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.4rem}
+  .stat-card{padding:1.1rem 1.3rem;flex:1 1 160px}
+  .stat-value{font-family:var(--font-display);font-size:1.9rem;font-weight:700}
+  .stat-label{font-size:.85rem;color:var(--slate);margin-top:.2rem}
+
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+  @media (max-width:760px){.two-col{grid-template-columns:1fr}}
+
+  .chart-card{padding:1.2rem}
+  .chart-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1rem}
+  .bars{display:flex;align-items:flex-end;gap:.9rem;height:140px}
+  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%}
+  .bar-track{flex:1;display:flex;align-items:flex-end;width:100%}
+  .bar-fill{width:100%;border-radius:3px 3px 0 0;transition:height .4s ease}
+
+  .map-card{padding:1.2rem}
+  .map-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1rem}
+  @media (max-width:640px){.map-grid{grid-template-columns:1fr}}
+  .map-svg{width:100%;height:auto;background:#e4e7dd;border-radius:6px}
+  .pin{cursor:pointer}
+  .map-pin-list{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.8rem}
+
+  .notice-row{display:flex;gap:.7rem;font-size:.9rem}
+  .notice-list{display:flex;flex-direction:column;gap:.6rem}
+
+  .error-box{font-family:monospace;background:#2a1414;color:#ffb4b4;padding:1rem;white-space:pre-wrap;border-radius:6px;margin:1rem 2rem}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* =====================================================================
+   CampusTwin — Phase 1 Interface Demo (zero-install, single-file build)
+   No npm, no build step, no server required — just open this file.
+   Everything here is mocked/in-memory; wire to the real Express/MongoDB
+   backend in Phase 2 (see comments marked PHASE 2).
+===================================================================== */
+try {
+
+// ---------------------------------------------------------------
+// Mock data
+// ---------------------------------------------------------------
+const notifications = [
+  { tag: "EVENT", text: "Tech Fest registrations close Friday, 6 PM." },
+  { tag: "FACULTY", text: "Dr. Chahar rescheduled CS-301 to Room B-204." },
+  { tag: "ADMIN", text: "Fee payment window extended to 5 Aug." },
+  { tag: "ALERT", text: "Water supply maintenance in Block C, 2–4 PM." },
+  { tag: "EVENT", text: "Guest lecture on distributed systems, LT-1, 3 PM." },
+];
+
+const campusBuildings = [
+  { id: "A", name: "Admin Block", code: "A-100", x: 18, y: 30, color: "#a63d2f" },
+  { id: "B", name: "CS Department", code: "B-200", x: 42, y: 20, color: "#2f5d50" },
+  { id: "C", name: "Central Library", code: "C-100", x: 62, y: 34, color: "#d98e2b" },
+  { id: "D", name: "Hostel Block D", code: "D-400", x: 78, y: 62, color: "#5b6470" },
+  { id: "E", name: "Sports Complex", code: "E-500", x: 30, y: 74, color: "#2f5d50" },
+  { id: "F", name: "Main Auditorium", code: "F-100", x: 55, y: 58, color: "#d98e2b" },
+];
+
+const attendanceTrend = [
+  { label: "Mon", value: 88 }, { label: "Tue", value: 91 }, { label: "Wed", value: 79 },
+  { label: "Thu", value: 94 }, { label: "Fri", value: 82 }, { label: "Sat", value: 96 },
+];
+
+const departmentStrength = [
+  { label: "CSE", value: 640 }, { label: "ECE", value: 410 }, { label: "ME", value: 300 },
+  { label: "Civil", value: 220 }, { label: "MBA", value: 180 },
+];
+
+const featureStatus = [
+  { name: "Registration & Login", status: "done" },
+  { name: "JWT Auth + Roles", status: "done" },
+  { name: "Protected Routes", status: "done" },
+  { name: "Role Dashboards (UI)", status: "progress" },
+  { name: "Real-Time Notifications", status: "planned" },
+  { name: "Live Campus Map (API-backed)", status: "planned" },
+  { name: "Analytics (real data)", status: "planned" },
+];
+
+// ---------------------------------------------------------------
+// App state (simple hand-rolled router/state machine — no framework)
+// ---------------------------------------------------------------
+const state = {
+  view: "landing",      // landing | login | register | dashboard
+  user: null,           // { name, email, role, department, year }
+  tickerIndex: 0,
+  activeBuilding: campusBuildings[0],
+  facultyPosts: [{ text: "Assignment 3 deadline moved to Monday." }],
+};
+
+const app = document.getElementById("app");
+
+function nav(view) {
+  state.view = view;
+  render();
+  window.scrollTo(0, 0);
+}
+
+function logout() {
+  state.user = null;
+  nav("landing");
+}
+
+// ---------------------------------------------------------------
+// Small render helpers
+// ---------------------------------------------------------------
+function badgeClass(status) { return "badge badge-" + status; }
+
+function tickerHTML() {
+  const n = notifications[state.tickerIndex % notifications.length];
+  return `
+    <div class="ticker">
+      <span class="dot"></span>
+      <span style="letter-spacing:.06em;opacity:.85">LIVE</span>
+      <span style="opacity:.5">/</span>
+      <span>[${n.tag}]</span>
+      <span style="opacity:.92">${n.text}</span>
+    </div>`;
+}
+
+function navbarHTML() {
+  const right = state.user
+    ? `<span class="eyebrow" style="color:#9aa7bd">${state.user.role} · ${state.user.name}</span>
+       <button class="btn btn-outline" data-action="logout">Log out</button>`
+    : `<button class="btn btn-outline" data-action="nav" data-view="login">Log in</button>
+       <button class="btn btn-primary" data-action="nav" data-view="register">Register</button>`;
+  return `
+    <header class="navbar">
+      <button class="brand" data-action="nav" data-view="landing">
+        <span class="brand-name">CampusTwin</span>
+        <span class="eyebrow" style="color:#9aa7bd">360°</span>
+      </button>
+      <nav class="navlinks">${right}</nav>
+    </header>`;
+}
+
+function featureListHTML() {
+  return featureStatus.map(f => `
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:.92rem">${f.name}</span>
+      <span class="${badgeClass(f.status)}">${f.status}</span>
+    </div>`).join("");
+}
+
+function barsHTML(data, color) {
+  const max = Math.max(...data.map(d => d.value));
+  return `<div class="bars">` + data.map(d => `
+      <div class="bar-col">
+        <div class="bar-track">
+          <div class="bar-fill" title="${d.value}" style="height:${(d.value/max)*100}%;background:${color}"></div>
+        </div>
+        <div class="eyebrow" style="margin-top:.4rem">${d.label}</div>
+      </div>`).join("") + `</div>`;
+}
+
+function mapHTML() {
+  const b = state.activeBuilding;
+  const pins = campusBuildings.map(bd => `
+    <g class="pin" data-action="pick-building" data-id="${bd.id}" transform="translate(${bd.x},${bd.y})">
+      <circle r="${bd.id===b.id?4.2:3.2}" fill="${bd.color}" stroke="#fff" stroke-width="0.6"/>
+      <text y="-5.5" text-anchor="middle" font-size="3.4" font-family="Consolas, monospace" fill="#16233a">${bd.id}</text>
+    </g>`).join("");
+  const chips = campusBuildings.map(bd => `
+    <button class="btn btn-ghost" style="padding:.35rem .6rem;font-size:.72rem" data-action="pick-building" data-id="${bd.id}">${bd.id} · ${bd.code}</button>`).join("");
+  return `
+    <div class="card map-card">
+      <div class="chart-head"><h3 style="font-size:1rem">Campus Map</h3><span class="eyebrow">interactive · demo layout</span></div>
+      <div class="map-grid">
+        <svg class="map-svg" viewBox="0 0 100 90">
+          <rect x="8" y="8" width="84" height="74" fill="none" stroke="#c3c7ba" stroke-width="0.6"/>
+          <line x1="8" y1="45" x2="92" y2="45" stroke="#c3c7ba" stroke-width="0.4" stroke-dasharray="1.5 1.5"/>
+          <line x1="50" y1="8" x2="50" y2="82" stroke="#c3c7ba" stroke-width="0.4" stroke-dasharray="1.5 1.5"/>
+          ${pins}
+        </svg>
+        <div>
+          <div class="eyebrow" style="margin-bottom:.3rem">${b.code}</div>
+          <div style="font-family:var(--font-display);font-weight:700;margin-bottom:.5rem">${b.name}</div>
+          <p style="font-size:.85rem;color:var(--slate)">Tap a marker to preview a building. Live occupancy, room booking, and turn-by-turn directions are planned for the Phase 2 map integration.</p>
+          <div class="map-pin-list">${chips}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ---------------------------------------------------------------
+// Views
+// ---------------------------------------------------------------
+function viewLanding() {
+  return `
+    ${navbarHTML()}
+    ${tickerHTML()}
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="eyebrow" style="color:#9aa7bd;margin-bottom:.9rem">Chitkara University · School of Engineering and Technology</div>
+        <h1>One directory board for the whole campus.</h1>
+        <p>CampusTwin is a live, role-based digital twin of the college — replacing scattered notice boards and spreadsheets with one place students, faculty, and admins actually check.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" data-action="nav" data-view="register">Get started →</button>
+          <button class="btn btn-outline" data-action="nav" data-view="login">I already have an account</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="eyebrow" style="margin-bottom:.6rem">Directory</div>
+      <h2 style="font-size:1.5rem;margin-bottom:1.6rem">Find your wing</h2>
+      <div class="grid3">
+        <button class="wing" data-action="nav" data-view="register">
+          <div class="wing-code">S · 100</div>
+          <div class="wing-title">Student Wing</div>
+          <div class="wing-desc">Timetable, attendance, notices, and campus map in one dashboard.</div>
+        </button>
+        <button class="wing" data-action="nav" data-view="register">
+          <div class="wing-code">F · 200</div>
+          <div class="wing-title">Faculty Wing</div>
+          <div class="wing-desc">Post announcements, manage sections, track department activity.</div>
+        </button>
+        <button class="wing" data-action="nav" data-view="register">
+          <div class="wing-code">A · 300</div>
+          <div class="wing-title">Admin Wing</div>
+          <div class="wing-desc">Oversee users, departments, and campus-wide broadcasts.</div>
+        </button>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0">
+      <div class="card" style="padding:1.4rem 1.6rem">
+        <div class="chart-head"><h3 style="font-size:1rem">Build status — Phase 1</h3><span class="eyebrow">as of this evaluation</span></div>
+        <div style="display:flex;flex-direction:column;gap:.55rem">${featureListHTML()}</div>
+      </div>
+    </section>
+
+    <footer class="footer">CampusTwin — Back-end Engineering (25CS022) · Continuous Assessment</footer>
+  `;
+}
+
+function viewLogin() {
+  return `
+    ${navbarHTML()}
+    <div class="auth-wrap">
+      <div class="card auth-card">
+        <div class="eyebrow" style="margin-bottom:.5rem">Log in</div>
+        <h1 style="font-size:1.5rem;margin-bottom:1.6rem">Welcome back.</h1>
+        <form id="login-form">
+          <div class="field"><label>Email</label><input id="login-email" type="email" placeholder="rahul@campus.edu" required></div>
+          <div class="field"><label>Password</label><input id="login-password" type="password" placeholder="••••••••" required></div>
+          <div class="field">
+            <label>Log in as</label>
+            <select id="login-role">
+              <option value="student">Student</option>
+              <option value="faculty">Faculty</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div id="login-error" style="color:var(--brick);font-size:.85rem;margin-bottom:1rem"></div>
+          <button type="submit" class="btn btn-primary" style="width:100%">Log in →</button>
+        </form>
+        <p style="font-size:.82rem;color:var(--slate);margin-top:1.3rem;text-align:center">This is a Phase 1 demo — any email/password combination works, and the "log in as" field picks which dashboard you'll land on.</p>
+        <p style="font-size:.85rem;margin-top:1rem;text-align:center">New here? <a href="#" data-action="nav" data-view="register" style="color:var(--quad);font-weight:700">Create an account</a></p>
+      </div>
+    </div>
+  `;
+}
+
+function viewRegister() {
+  return `
+    ${navbarHTML()}
+    <div class="auth-wrap">
+      <div class="card auth-card wide">
+        <div class="eyebrow" style="margin-bottom:.5rem">Register</div>
+        <h1 style="font-size:1.5rem;margin-bottom:1.6rem">Join CampusTwin.</h1>
+        <form id="register-form">
+          <div class="field"><label>Full name</label><input id="reg-name" placeholder="Rahul Sharma" required></div>
+          <div class="field"><label>Email</label><input id="reg-email" type="email" placeholder="rahul@campus.edu" required></div>
+          <div class="field"><label>Password</label><input id="reg-password" type="password" placeholder="••••••••" required></div>
+          <div style="display:flex;gap:.8rem">
+            <div class="field" style="flex:1">
+              <label>Role</label>
+              <select id="reg-role">
+                <option value="student">Student</option>
+                <option value="faculty">Faculty</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div class="field" style="flex:1">
+              <label>Department</label>
+              <select id="reg-department">
+                <option>CSE</option><option>ECE</option><option>ME</option><option>Civil</option><option>MBA</option>
+              </select>
+            </div>
+          </div>
+          <div id="reg-error" style="color:var(--brick);font-size:.85rem;margin-bottom:1rem"></div>
+          <button type="submit" class="btn btn-primary" style="width:100%">Create account →</button>
+        </form>
+        <p style="font-size:.82rem;color:var(--slate);margin-top:1.3rem;text-align:center">Phase 1 demo — accounts live only in this browser tab. Phase 2 wires this to POST /api/auth/register with bcrypt + MongoDB.</p>
+        <p style="font-size:.85rem;margin-top:1rem;text-align:center">Already registered? <a href="#" data-action="nav" data-view="login" style="color:var(--quad);font-weight:700">Log in</a></p>
+      </div>
+    </div>
+  `;
+}
+
+function sidebarHTML(roleLabel, roleCode, navItems) {
+  const items = navItems.map(i => `<div>${i}</div>`).join("");
+  return `
+    <aside class="sidebar">
+      <div>
+        <div class="eyebrow" style="color:#8f9db4">CampusTwin / ${roleCode}</div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:1.05rem;margin-top:.2rem">${roleLabel} Wing</div>
+      </div>
+      <nav class="sidebar-nav">${items}</nav>
+      <div class="sidebar-foot">
+        <div style="font-size:.82rem;font-weight:700">${state.user.name}</div>
+        <div class="eyebrow" style="color:#8f9db4;margin-bottom:.7rem">${state.user.email}</div>
+        <button class="btn btn-outline" style="width:100%" data-action="logout">Log out</button>
+      </div>
+    </aside>`;
+}
+
+function viewStudentDashboard() {
+  const first = (state.user.name || "there").split(" ")[0];
+  return `
+    <div class="layout">
+      ${tickerHTML()}
+      <div class="body-row">
+        ${sidebarHTML("Student", "STU", ["Overview","Timetable","Attendance","Notices","Campus Map"])}
+        <main class="main">
+          <div class="eyebrow" style="margin-bottom:.4rem">Overview</div>
+          <h1 style="font-size:1.6rem;margin-bottom:1.6rem">Hey ${first}, here's your week.</h1>
+          <div class="stat-row">
+            <div class="card stat-card"><div class="eyebrow">ATT</div><div class="stat-value" style="color:var(--quad)">88%</div><div class="stat-label">Attendance this week</div></div>
+            <div class="card stat-card"><div class="eyebrow">CLS</div><div class="stat-value" style="color:var(--quad)">4</div><div class="stat-label">Classes today</div></div>
+            <div class="card stat-card"><div class="eyebrow">NOT</div><div class="stat-value" style="color:var(--signal)">${notifications.length}</div><div class="stat-label">Unread notices</div></div>
+            <div class="card stat-card"><div class="eyebrow">DEP</div><div class="stat-value" style="color:var(--quad)">${state.user.department||"CSE"}</div><div class="stat-label">Department</div></div>
+          </div>
+          <div class="two-col">
+            <div class="card chart-card">
+              <div class="chart-head"><h3 style="font-size:1rem">Attendance trend</h3><span class="eyebrow">fig — att.01</span></div>
+              ${barsHTML(attendanceTrend, "var(--quad)")}
+            </div>
+            ${mapHTML()}
+          </div>
+          <div class="card" style="padding:1.2rem;margin-top:1.2rem">
+            <div class="chart-head"><h3 style="font-size:1rem">Recent notices</h3><span class="eyebrow">live feed</span></div>
+            <div class="notice-list">${notifications.map(n=>`<div class="notice-row"><span class="badge badge-progress">${n.tag}</span><span>${n.text}</span></div>`).join("")}</div>
+          </div>
+        </main>
+      </div>
+    </div>`;
+}
+
+function viewFacultyDashboard() {
+  return `
+    <div class="layout">
+      ${tickerHTML()}
+      <div class="body-row">
+        ${sidebarHTML("Faculty", "FAC", ["Overview","My Sections","Attendance","Post Notice","Campus Map"])}
+        <main class="main">
+          <div class="eyebrow" style="margin-bottom:.4rem">Overview</div>
+          <h1 style="font-size:1.6rem;margin-bottom:1.6rem">Welcome, ${state.user.name}.</h1>
+          <div class="stat-row">
+            <div class="card stat-card"><div class="eyebrow">SEC</div><div class="stat-value" style="color:var(--quad)">3</div><div class="stat-label">Sections handled</div></div>
+            <div class="card stat-card"><div class="eyebrow">STU</div><div class="stat-value" style="color:var(--quad)">128</div><div class="stat-label">Students taught</div></div>
+            <div class="card stat-card"><div class="eyebrow">AVG</div><div class="stat-value" style="color:var(--signal)">86%</div><div class="stat-label">Avg. attendance</div></div>
+            <div class="card stat-card"><div class="eyebrow">DEP</div><div class="stat-value" style="color:var(--quad)">${state.user.department||"CSE"}</div><div class="stat-label">Department</div></div>
+          </div>
+          <div class="two-col">
+            <div class="card chart-card">
+              <div class="chart-head"><h3 style="font-size:1rem">Section attendance trend</h3><span class="eyebrow">fig — att.02</span></div>
+              ${barsHTML(attendanceTrend, "var(--signal)")}
+            </div>
+            <div class="card" style="padding:1.2rem">
+              <div class="chart-head"><h3 style="font-size:1rem">Post a notice</h3><span class="eyebrow">broadcast</span></div>
+              <form id="post-form" style="display:flex;gap:.6rem;margin-bottom:1rem">
+                <input id="post-input" placeholder="e.g. Class shifted to Room B-204" style="flex:1;border:1px solid var(--line);border-radius:4px;padding:.6rem .7rem;font-size:.88rem">
+                <button type="submit" class="btn btn-primary">Post</button>
+              </form>
+              <div id="post-list" style="display:flex;flex-direction:column;gap:.5rem">
+                ${state.facultyPosts.map(p=>`<div style="font-size:.88rem;display:flex;gap:.6rem"><span class="badge badge-done">SENT</span><span>${p.text}</span></div>`).join("")}
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>`;
+}
+
+function viewAdminDashboard() {
+  return `
+    <div class="layout">
+      ${tickerHTML()}
+      <div class="body-row">
+        ${sidebarHTML("Admin", "ADM", ["Overview","Users","Departments","Broadcasts","Campus Map","Build Status"])}
+        <main class="main">
+          <div class="eyebrow" style="margin-bottom:.4rem">Overview</div>
+          <h1 style="font-size:1.6rem;margin-bottom:1.6rem">Campus, at a glance.</h1>
+          <div class="stat-row">
+            <div class="card stat-card"><div class="eyebrow">USR</div><div class="stat-value" style="color:var(--quad)">1,750</div><div class="stat-label">Total users</div></div>
+            <div class="card stat-card"><div class="eyebrow">DEP</div><div class="stat-value" style="color:var(--quad)">5</div><div class="stat-label">Departments</div></div>
+            <div class="card stat-card"><div class="eyebrow">EVT</div><div class="stat-value" style="color:var(--signal)">6</div><div class="stat-label">Upcoming events</div></div>
+            <div class="card stat-card"><div class="eyebrow">SYS</div><div class="stat-value" style="color:var(--quad)">Auth Live</div><div class="stat-label">Backend status</div></div>
+          </div>
+          <div class="two-col">
+            <div class="card chart-card">
+              <div class="chart-head"><h3 style="font-size:1rem">Department strength</h3><span class="eyebrow">fig — dept.01</span></div>
+              ${barsHTML(departmentStrength, "var(--brick)")}
+            </div>
+            ${mapHTML()}
+          </div>
+          <div class="card" style="padding:1.2rem;margin-top:1.2rem">
+            <div class="chart-head"><h3 style="font-size:1rem">Build status — Phase 1</h3><span class="eyebrow">feature checklist</span></div>
+            <div style="display:flex;flex-direction:column;gap:.55rem">${featureListHTML()}</div>
+          </div>
+        </main>
+      </div>
+    </div>`;
+}
+
+// ---------------------------------------------------------------
+// Master render
+// ---------------------------------------------------------------
+function render() {
+  let html = "";
+  if (state.view === "landing") html = viewLanding();
+  else if (state.view === "login") html = viewLogin();
+  else if (state.view === "register") html = viewRegister();
+  else if (state.view === "dashboard" && state.user?.role === "student") html = viewStudentDashboard();
+  else if (state.view === "dashboard" && state.user?.role === "faculty") html = viewFacultyDashboard();
+  else if (state.view === "dashboard" && state.user?.role === "admin") html = viewAdminDashboard();
+  else html = viewLanding();
+
+  app.innerHTML = html;
+  wireEvents();
+}
+
+// ---------------------------------------------------------------
+// Event wiring (event delegation + form handlers, re-attached each render)
+// ---------------------------------------------------------------
+function wireEvents() {
+  app.querySelectorAll('[data-action="nav"]').forEach(el => {
+    el.addEventListener("click", (e) => { e.preventDefault(); nav(el.getAttribute("data-view")); });
+  });
+  app.querySelectorAll('[data-action="logout"]').forEach(el => {
+    el.addEventListener("click", (e) => { e.preventDefault(); logout(); });
+  });
+  app.querySelectorAll('[data-action="pick-building"]').forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      const id = el.getAttribute("data-id");
+      state.activeBuilding = campusBuildings.find(b => b.id === id) || state.activeBuilding;
+      render();
+    });
+  });
+
+  const loginForm = document.getElementById("login-form");
+  if (loginForm) {
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+      const role = document.getElementById("login-role").value;
+      if (!email || !password) {
+        document.getElementById("login-error").textContent = "Enter both email and password to continue.";
+        return;
+      }
+      // PHASE 2: replace with POST /api/auth/login
+      state.user = { name: email.split("@")[0].replace(/\./g, " "), email, role, department: role === "admin" ? "Administration" : "CSE" };
+      state.view = "dashboard";
+      render();
+    });
+  }
+
+  const registerForm = document.getElementById("register-form");
+  if (registerForm) {
+    registerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("reg-name").value.trim();
+      const email = document.getElementById("reg-email").value.trim();
+      const password = document.getElementById("reg-password").value;
+      const role = document.getElementById("reg-role").value;
+      const department = document.getElementById("reg-department").value;
+      if (!name || !email || !password) {
+        document.getElementById("reg-error").textContent = "Fill in your name, email, and password to continue.";
+        return;
+      }
+      // PHASE 2: replace with POST /api/auth/register
+      state.user = { name, email, role, department };
+      state.view = "dashboard";
+      render();
+    });
+  }
+
+  const postForm = document.getElementById("post-form");
+  if (postForm) {
+    postForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("post-input");
+      if (!input.value.trim()) return;
+      state.facultyPosts.unshift({ text: input.value.trim() });
+      render();
+    });
+  }
+}
+
+// ---------------------------------------------------------------
+// "Live" ticker — cycles the notification bar every few seconds
+// ---------------------------------------------------------------
+setInterval(() => {
+  state.tickerIndex = (state.tickerIndex + 1) % notifications.length;
+  const el = document.querySelector(".ticker");
+  if (el) el.outerHTML = tickerHTML();
+}, 3200);
+
+// ---------------------------------------------------------------
+// Boot
+// ---------------------------------------------------------------
+render();
+
+} catch (err) {
+  document.getElementById("app").innerHTML =
+    '<div class="error-box"><b>CampusTwin hit an error while starting:</b>\\n\\n' +
+    (err && err.message ? err.message : String(err)) +
+    '\\n\\nOpen your browser console (F12) for the full stack trace.</div>';
+  console.error(err);
+}
+</script>
+</body>
+</html>

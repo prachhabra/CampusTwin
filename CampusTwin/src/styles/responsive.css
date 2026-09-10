@@ -1,0 +1,204 @@
+/* ================================
+   RESPONSIVE CSS
+================================ */
+
+/* Tablets */
+
+@media (max-width: 1100px) {
+
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sidebar {
+    width: 220px;
+  }
+
+  .main-content {
+    margin-left: 220px;
+    width: calc(100% - 220px);
+  }
+
+  .page-container {
+    padding: 25px;
+  }
+}
+
+
+/* Small Tablets */
+
+@media (max-width: 768px) {
+
+  /* Sidebar */
+
+  .sidebar {
+    transform: translateX(-100%);
+    width: 250px;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Main */
+
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  /* Navbar */
+
+  .menu-button {
+    display: block;
+  }
+
+  .top-navbar {
+    padding: 0 18px;
+  }
+
+  .navbar-right {
+    gap: 10px;
+  }
+
+  .profile-info {
+    display: none;
+  }
+
+  /* Page */
+
+  .page-container {
+    padding: 20px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .admin-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .page-header h1,
+  .admin-page-header h1 {
+    font-size: 24px;
+  }
+
+  /* Cards */
+
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .dashboard-card {
+    padding: 18px;
+  }
+
+  /* Modal */
+
+  .modal {
+    padding: 22px;
+  }
+}
+
+
+/* Mobile */
+
+@media (max-width: 480px) {
+
+  /* Navbar */
+
+  .top-navbar {
+    height: 60px;
+    padding: 0 14px;
+  }
+
+  .navbar-left h3 {
+    font-size: 16px;
+  }
+
+  .profile-avatar {
+    width: 35px;
+    height: 35px;
+  }
+
+  /* Page */
+
+  .page-container {
+    padding: 15px;
+  }
+
+  .page-header h1,
+  .admin-page-header h1 {
+    font-size: 21px;
+  }
+
+  .page-subtitle {
+    font-size: 13px;
+  }
+
+  /* Cards */
+
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .dashboard-card {
+    padding: 16px;
+    margin-bottom: 15px;
+  }
+
+  .big-number {
+    font-size: 26px;
+  }
+
+  /* Buttons */
+
+  button {
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+
+  /* Modal */
+
+  .modal-overlay {
+    padding: 12px;
+  }
+
+  .modal {
+    padding: 18px;
+    max-height: 95vh;
+  }
+
+  .modal h2 {
+    font-size: 19px;
+  }
+
+  /* Table */
+
+  .table-container {
+    margin-left: -5px;
+    margin-right: -5px;
+  }
+
+  table {
+    min-width: 700px;
+  }
+
+  /* Modal buttons */
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-actions button {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+}
